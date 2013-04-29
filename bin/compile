@@ -11,6 +11,10 @@ APACHE_PATH="apache"
 PHP_VERSION="5.4.14"
 PHP_PATH="php"
 
+MEMCACHED_VERSION = "1.4.15"
+MEMCACHED_PATH = 'memcached'
+
+
 BIN_DIR=$(dirname $0)
 BUILD_DIR=$1
 CACHE_DIR=$2
@@ -21,39 +25,43 @@ shopt -s dotglob
 
 cd $BUILD_DIR
 
-# move app things to www
+# Movendo a aplicação para a pasta www
 mkdir -p $CACHE_DIR/www
 mv * $CACHE_DIR/www
 mv $CACHE_DIR/www .
 
-# keep Procfile
 if [ -f www/Procfile ]; then
   mv www/Procfile .
 fi
 
+# Apache Dependencies package
 APACHE_DEPENDENCIES_URL="https://dl.dropboxusercontent.com/u/954001/heroku/apache/apache-$APACHE_VERSION-dependencies.tar.gz"
-echo "-----> Bundling Apache Dependencies version $APACHE_VERSION"
+echo "-----> Bundling Apache version $APACHE_VERSION dependencies "
 curl --silent --max-time 60 --location "$APACHE_DEPENDENCIES_URL" | tar xz
 
+# Apache package
 APACHE_URL="https://dl.dropboxusercontent.com/u/954001/heroku/apache/apache-$APACHE_VERSION.tar.gz"
 echo "-----> Bundling Apache version $APACHE_VERSION"
 curl --silent --max-time 60 --location "$APACHE_URL" | tar xz
 
+# PHP package
 PHP_URL="https://dl.dropboxusercontent.com/u/954001/heroku/php/php-$PHP_VERSION.tar.gz"
 echo "-----> Bundling PHP version $PHP_VERSION"
 curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 
-mkdir -p $APACHE_PATH/conf
+# Memcached
+MEMCACHED_URL="https://dl.dropboxusercontent.com/u/954001/heroku/mencached/memcached-$MEMCACHED_VERSION.tar.gz"
+echo "-----> Bundling Mencached version $MEMCACHED_VERSION"
+curl --silent --max-time 60 --location "$MEMCACHED_URL" | tar xz
 
-# update config files
+
+# Sobrescrevendo o arquivo de configuração do PHP
+mkdir -p $APACHE_PATH/conf
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
+
+# Sobrescrevendo o arquivo de configuração do PHP
 cp $LP_DIR/conf/php.ini php
 
-# make php available on bin
-mkdir -p bin
-ln -s /app/php/bin/php bin/php
-
-# check if we have Composer dependencies and vendors are not bundled
 if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
   GIT_DIR_ORIG=$GIT_DIR
   unset GIT_DIR
@@ -61,7 +69,7 @@ if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
   COMPOSER_URL="http://getcomposer.org/composer.phar"
   curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
   cd www
-  LD_LIBRARY_PATH=$LP_DIR/php/lib/php/extensions/no-debug-zts-20100525 $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+  LD_LIBRARY_PATH=$BUILD_DIR/php/lib/php/extensions/no-debug-zts-20100525 $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
   cd $BUILD_DIR
   rm www/composer.phar
   export GIT_DIR=$GIT_DIR_ORIG
@@ -71,14 +79,22 @@ cat >>boot.sh <<EOF
 for var in \`env|cut -f1 -d=\`; do
   echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
 done
+
 touch /app/apache/logs/error_log
 touch /app/apache/logs/access_log
+
 tail -F /app/apache/logs/error_log &
 tail -F /app/apache/logs/access_log &
+
 export PHP_INI_SCAN_DIR=/app/www
 export LD_LIBRARY_PATH=/app/php/lib/php/extensions/no-debug-zts-20100525
+
 echo "Launching apache"
 exec /app/apache/bin/httpd -f /app/apache/conf/httpd.conf -DNO_DETACH
+
+echo "Launching mencached"
+exec /app/memcached/bin/mencached
+
 EOF
 
 chmod +x boot.sh
