@@ -46,6 +46,7 @@ mkdir -p $APACHE_PATH/conf
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 cp $LP_DIR/conf/php.ini php
 
+mkdir $BUILD_DIR/php/ext
 
 # make php available on bin
 mkdir -p bin
