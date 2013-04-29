@@ -66,6 +66,7 @@ fi
 cat >>boot.sh <<EOF
 for var in \`env|cut -f1 -d=\`; do
   echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
+  rm -rf /app/apache/conf/httpd.conf.bkp;
 done
 touch /app/apache/logs/error_log
 touch /app/apache/logs/access_log
