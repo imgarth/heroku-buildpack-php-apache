@@ -11,8 +11,8 @@ APACHE_PATH="apache"
 PHP_VERSION="5.4.14"
 PHP_PATH="php"
 
-MEMCACHED_VERSION = "1.4.15"
-MEMCACHED_PATH = 'memcached'
+MEMCACHED_VERSION="1.4.15"
+MEMCACHED_PATH='memcached'
 
 
 BIN_DIR=$(dirname $0)
