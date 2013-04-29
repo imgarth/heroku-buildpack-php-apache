@@ -31,6 +31,10 @@ if [ -f www/Procfile ]; then
   mv www/Procfile .
 fi
 
+APACHE_DEPENDENCIES_URL="https://dl.dropboxusercontent.com/u/954001/heroku/apache/apache-$APACHE_VERSION-dependencies.tar.gz"
+echo "-----> Bundling Apache Dependencies version $APACHE_VERSION"
+curl --silent --max-time 60 --location "$APACHE_DEPENDENCIES_URL" | tar xz
+
 APACHE_URL="https://dl.dropboxusercontent.com/u/954001/heroku/apache/apache-$APACHE_VERSION.tar.gz"
 echo "-----> Bundling Apache version $APACHE_VERSION"
 curl --silent --max-time 60 --location "$APACHE_URL" | tar xz
@@ -67,7 +71,7 @@ touch /app/apache/logs/error_log
 touch /app/apache/logs/access_log
 tail -F /app/apache/logs/error_log &
 tail -F /app/apache/logs/access_log &
-export LD_LIBRARY_PATH=/app/php/lib/php/extensions
+export LD_LIBRARY_PATH=/app/php/lib/php/extensions/no-debug-zts-20100525
 export PHP_INI_SCAN_DIR=/app/www
 echo "Launching apache"
 exec /app/apache/bin/httpd -DNO_DETACH
