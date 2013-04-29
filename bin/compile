@@ -46,9 +46,6 @@ mkdir -p $APACHE_PATH/conf
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 cp $LP_DIR/conf/php.ini php
 
-mkdir $BUILD_DIR/php/lib/php/extensions
-
-
 # check if we have Composer dependencies and vendors are not bundled
 if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
   GIT_DIR_ORIG=$GIT_DIR
