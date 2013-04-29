@@ -66,16 +66,15 @@ fi
 cat >>boot.sh <<EOF
 for var in \`env|cut -f1 -d=\`; do
   echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
-  rm -rf /app/apache/conf/httpd.conf.bkp;
 done
 touch /app/apache/logs/error_log
 touch /app/apache/logs/access_log
 tail -F /app/apache/logs/error_log &
 tail -F /app/apache/logs/access_log &
-export LD_LIBRARY_PATH=/app/php/lib/php/extensions/no-debug-zts-20100525
+export LD_LIBRARY_PATH=$BUILD_DIR/php/lib/php/extensions/no-debug-zts-20100525
 export PHP_INI_SCAN_DIR=/app/www
 echo "Launching apache"
-exec /app/apache/bin/httpd -DNO_DETACH
+exec /app/apache/bin/httpd -f /app/apache/conf/httpd.conf -DNO_DETACH
 EOF
 
 chmod +x boot.sh
