@@ -11,9 +11,6 @@ APACHE_PATH="apache"
 PHP_VERSION="5.4.14"
 PHP_PATH="php"
 
-ICU_VERSION="50.1.2"
-ICU_PATH="icu"
-
 BIN_DIR=$(dirname $0)
 BUILD_DIR=$1
 CACHE_DIR=$2
@@ -42,11 +39,6 @@ PHP_URL="https://dl.dropboxusercontent.com/u/954001/heroku/php/php-$PHP_VERSION.
 echo "-----> Bundling PHP version $PHP_VERSION"
 curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 
-ICU_URL="https://dl.dropboxusercontent.com/u/954001/heroku/icu/icu-$ICU_VERSION.tar.gz"
-echo "-----> Bundling ICU version $ICU_VERSION"
-curl --silent --max-time 60 --location "$ICU_URL" | tar xz
-
-
 mkdir -p $APACHE_PATH/conf
 
 # update config files
@@ -61,7 +53,7 @@ if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
   COMPOSER_URL="http://getcomposer.org/composer.phar"
   curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
   cd www
-  LD_LIBRARY_PATH=$BUILD_DIR/$ICU_PATH $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+  LD_LIBRARY_PATH=$BUILD_DIR/php/lib/php/extensions/no-debug-zts-20100525 $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
   cd $BUILD_DIR
   rm www/composer.phar
   export GIT_DIR=$GIT_DIR_ORIG
