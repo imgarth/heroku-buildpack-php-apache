@@ -46,11 +46,8 @@ mkdir -p $APACHE_PATH/conf
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 cp $LP_DIR/conf/php.ini php
 
-mkdir $BUILD_DIR/php/ext
+mkdir $BUILD_DIR/php/lib/php/extensions
 
-# make php available on bin
-mkdir -p bin
-ln -s /app/php/bin/php bin/php
 
 # check if we have Composer dependencies and vendors are not bundled
 if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
@@ -60,7 +57,7 @@ if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
   COMPOSER_URL="http://getcomposer.org/composer.phar"
   curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
   cd www
-  LD_LIBRARY_PATH=$BUILD_DIR/php/ext $BUILD_DIR/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+  LD_LIBRARY_PATH=$BUILD_DIR/php/lib/php/extensions $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
   cd $BUILD_DIR
   rm www/composer.phar
   export GIT_DIR=$GIT_DIR_ORIG
@@ -74,7 +71,7 @@ touch /app/apache/logs/error_log
 touch /app/apache/logs/access_log
 tail -F /app/apache/logs/error_log &
 tail -F /app/apache/logs/access_log &
-export LD_LIBRARY_PATH=/app/php/ext
+export LD_LIBRARY_PATH=/app/php/lib/php/extensions
 export PHP_INI_SCAN_DIR=/app/www
 echo "Launching apache"
 exec /app/apache/bin/httpd -DNO_DETACH
