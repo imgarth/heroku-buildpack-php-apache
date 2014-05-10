@@ -6,10 +6,10 @@ Apache + PHP build pack
 Versões
 --------
 
-Apache: 2.4.4
-ICU: 50.1.2
-PHP: 5.4.14
-Mencached: 1.4.15
+* Apache: 2.4.4
+* ICU: 50.1.2
+* PHP: 5.4.14
+* Mencached: 1.4.15
 
 Configuração
 -------------
@@ -18,6 +18,23 @@ Arquivos de configuração
 
 * conf/httpd.conf
 * conf/php.ini
+
+How to use it
+-------------
+
+Fork this Repo.
+
+Use the `--buildpack` parameter when creating a new app:
+
+```
+heroku create --buildpack https://github.com/YourName/heroku-buildpack-php-apache myapp
+```
+Or set the `BUILDPACK_URL` config var on an existing app:
+
+```
+heroku config:set BUILDPACK_URL=https://github.com/YourName/heroku-buildpack-php-apache
+```
+
 
 Compilando os binários
 ------------------
@@ -39,7 +56,7 @@ Compilando os binários
     curl -L "http://ufpr.dl.sourceforge.net/project/pcre/pcre/8.32/pcre-8.32.tar.gz" -o - | tar xz
     cd /app/pcre-8.32/
     ./configure --prefix=/app/pcre && make install
-    
+
     # [Apache](http://apache.org)
     cd /app
     curl -L "http://ftp.unicamp.br/pub/apache//httpd/httpd-2.4.4.tar.gz" -o - | tar xz
@@ -57,7 +74,7 @@ Compilando os binários
     curl -L "http://us.php.net/get/php-5.3.24.tar.gz/from/www.php.net/mirror" -o - | tar xz
     cd /app/php-5.3.24/
     ./configure --prefix=/app/php --with-mysql --with-pdo-mysql --with-pgsql --with-pdo-pgsql --with-iconv --with-gd --with-curl=/usr/lib --with-config-file-path=/app/php --enable-soap=shared --with-openssl --with-icu-dir=/app/icu4 --enable-intl --enable-fpm --with-zlib --enable-mbstring --disable-debug --enable-inline-optimization --with-bz2 --enable-mbregex --with-mhash --enable-zip --with-pcre-regex && make install
-    
+
     # [PHP 5.4](http://php.net)
     cd /app
     curl -L "http://us.php.net/get/php-5.4.14.tar.gz/from/www.php.net/mirror" -o - | tar xz
@@ -96,7 +113,7 @@ Compilando os binários
     # NEWRELIC
     cd /app
     curl -L "http://download.newrelic.com/php_agent/release/newrelic-php5-3.3.5.161-linux.tar.gz" -o - | tar xz
-    
+
     pushd /app/newrelic-php5-3.3.5.161-linux
 
     mkdir -p /app/newrelic/{bin,etc} /app/newrelic/var/{run,log} /app/newrelic/var/log/newrelic
@@ -122,10 +139,10 @@ Compilando os binários
 
     # Empacotando tudo
     cd /app
-    
+
     echo '2.4.4' > apache/VERSION
     tar -zcvf apache-2.4.4.tar.gz apache
-    
+
     echo '5.4.14' > php/VERSION
     tar -zcvf php-5.4.14.tar.gz php
 
